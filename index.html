@@ -21,7 +21,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col pb-6">
+<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
 
   <div id="loginOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center px-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-5 border border-slate-100 fade-in">
@@ -99,11 +99,11 @@
     <p class="text-xs font-bold text-slate-600 animate-pulse font-jakarta">Menyinkronkan Database...</p>
   </div>
 
-<div id="dashboardWrapper" class="hidden flex-1 flex flex-col md:flex-row w-full min-h-[calc(100vh-53px)] relative overflow-x-hidden">
+<div id="dashboardWrapper" class="hidden flex-1 flex flex-col md:flex-row w-full relative overflow-hidden">
     
     <div id="sidebarBackdrop" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/40 z-40 transition-opacity duration-300 md:hidden"></div>
 
-    <aside id="sidebarPanel" class="fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 p-4 flex flex-col justify-between z-50 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-xl md:shadow-none">
+    <aside id="sidebarPanel" class="fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 p-4 flex flex-col justify-between z-50 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-xl md:shadow-none overflow-y-auto custom-scrollbar">
       <div class="space-y-4">
         <div class="flex justify-between items-center md:hidden border-b border-slate-100 pb-2">
           <span class="text-[10px] font-bold uppercase text-slate-400">Navigasi</span>
@@ -115,8 +115,12 @@
           <button id="navBtnInput" onclick="switchTab('input')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-sm border border-emerald-500">
             <span>✏️ Input Nilai</span>
           </button>
-          <button id="navBtnAdmin" onclick="switchTab('admin')" class="hidden w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-transparent">
-            <span>👥 Manajemen Guru</span>
+          <!-- TOMBOL BARU UNTUK ADMIN -->
+          <button id="navBtnAdminGuru" onclick="switchTab('admin_guru')" class="hidden w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-transparent">
+            <span>👥 Guru & Jadwal</span>
+          </button>
+          <button id="navBtnAdminTugas" onclick="switchTab('admin_tugas')" class="hidden w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-transparent">
+            <span>📚 Manajemen Tugas</span>
           </button>
           <button id="navBtnAlpa" onclick="switchTab('alpa')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-transparent">
             <span>🔍 Cek Alpa (Belum Ujian)</span>
@@ -143,7 +147,7 @@
       </div>
     </aside>
 
-    <div class="flex-1 p-3 md:p-4 overflow-x-hidden w-full">
+    <div class="flex-1 p-3 md:p-4 overflow-y-auto overflow-x-hidden w-full custom-scrollbar pb-24">
       
       <div id="tabInput" class="tab-pane fade-in">
 
@@ -257,7 +261,7 @@
 
           <!-- INPUT MANUAL -->
           <div id="inputAreaManual" class="transition-all max-w-[200px] mx-auto mb-2">
-            <input type="number" step="any" id="scoreInputManual" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-3 py-3 text-center text-5xl font-jakarta font-black text-slate-800 outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 shadow-inner transition-all placeholder:text-slate-300" placeholder="0" oninput="syncManualToHidden()">
+            <input type="text" id="scoreInputManual" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-3 py-3 text-center text-5xl font-jakarta font-black text-slate-800 outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 shadow-inner transition-all placeholder:text-slate-300 uppercase" placeholder="0" oninput="syncManualToHidden()">
           </div>
 
           <!-- INPUT KALKULATOR (Satu Baris) -->
@@ -391,32 +395,104 @@
         </div>
       </div>
 
-      <div id="tabAdmin" class="hidden tab-pane fade-in space-y-4">
+      <!-- TAB GURU & KOREKTOR -->
+      <div id="tabAdminGuru" class="hidden tab-pane fade-in space-y-4">
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
-              <h2 class="text-base font-jakarta font-black text-slate-800 uppercase tracking-tight">Manajemen Akun & Tugas Guru</h2>
-              <p class="text-[10px] text-slate-400 font-semibold">Pantau progress kerja dan atur distribusi beban fan pelajaran</p>
+              <h2 class="text-base font-jakarta font-black text-slate-800 uppercase tracking-tight">Guru & Korektor</h2>
+              <p class="text-[10px] text-slate-400 font-semibold">Kelola akun dan jadwal akses login guru</p>
             </div>
-            <span class="bg-blue-50 text-blue-700 text-[10px] font-black px-2.5 py-1 rounded-md border border-blue-100 uppercase tracking-wide">Mode Administrator</span>
+            <button onclick="openFormGuruModal('tambah')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5">
+              ➕ Tambah Guru
+            </button>
           </div>
-
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-left border-collapse text-xs">
               <thead>
                 <tr class="border-b border-slate-200 bg-slate-50 text-slate-400 font-bold uppercase tracking-wider">
                   <th class="p-3">Identitas Guru</th>
-                  <th class="p-3">Daftar Tugas (Fan + Kelas)</th>
-                  <th class="p-3 text-center">Progress Kerja</th>
-                  <th class="p-3 text-right">Aksi</th>
+                  <th class="p-3 text-center">Jadwal Akses</th>
+                  <th class="p-3 text-right">Aksi Akun</th>
                 </tr>
               </thead>
-              <tbody id="teacherTableBody" class="divide-y divide-slate-100 text-slate-700">
-                </tbody>
+              <tbody id="guruTableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
             </table>
           </div>
         </div>
       </div>
+
+      <!-- TAB MANAJEMEN TUGAS -->
+      <div id="tabAdminTugas" class="hidden tab-pane fade-in space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <h2 class="text-base font-jakarta font-black text-slate-800 uppercase tracking-tight">Manajemen Tugas</h2>
+              <p class="text-[10px] text-slate-400 font-semibold">Daftar tugas yang dikerjakan guru (Bisa dihapus / ditambah)</p>
+            </div>
+            <span class="bg-sky-50 text-sky-700 text-[10px] font-black px-2.5 py-1 rounded-md border border-sky-100 uppercase tracking-wide">Mode Administrator</span>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-400 font-bold uppercase tracking-wider">
+                  <th class="p-3">Pengajar / Guru</th>
+                  <th class="p-3">Daftar Tugas (Model Kartu)</th>
+                  <th class="p-3 text-center">Progress</th>
+                  <th class="p-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tugasTableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL FORM GURU -->
+      <div id="formGuruModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] flex items-center justify-center px-4 fade-in overflow-y-auto py-10">
+        <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl p-5 border border-slate-100 my-auto">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <h3 id="formGuruTitle" class="text-sm font-bold text-slate-800 uppercase font-jakarta">Tambah Guru Baru</h3>
+            <button onclick="closeFormGuruModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+          </div>
+          <input type="hidden" id="guruFormMode">
+          <input type="hidden" id="guruFormRowNum">
+          
+          <div class="space-y-3 text-xs">
+            <div><label class="block font-bold text-slate-500 mb-1">Nama Guru Lengkap</label><input type="text" id="fgNama" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-2 outline-none focus:border-indigo-500 font-bold"></div>
+            <div><label class="block font-bold text-slate-500 mb-1">Username Login</label><input type="text" id="fgUser" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-2 outline-none focus:border-indigo-500"></div>
+            <div><label class="block font-bold text-slate-500 mb-1">Password</label><input type="text" id="fgPass" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-2 outline-none focus:border-indigo-500"></div>
+            <div>
+              <label class="block font-bold text-slate-500 mb-1">Role / Hak Akses</label>
+              <select id="fgRole" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-2 outline-none focus:border-indigo-500 font-bold">
+                <option value="GURU">GURU (Korektor)</option>
+                <option value="ADMIN">ADMIN</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-5 flex gap-2">
+            <button onclick="closeFormGuruModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-lg transition-all">BATAL</button>
+            <button onclick="submitGuruForm()" id="btnSubmitGuru" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition-all shadow-md">SIMPAN GURU</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL HAPUS GURU -->
+      <div id="deleteGuruConfirmModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] flex items-center justify-center px-4 fade-in">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-5 border border-slate-100 text-center">
+          <div class="inline-flex bg-rose-50 text-rose-500 p-3 rounded-full mb-3 border border-rose-100">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          </div>
+          <h3 class="text-sm font-bold text-slate-800 font-jakarta mb-1">Hapus Akun Guru?</h3>
+          <p class="text-xs text-slate-500 mb-5 leading-relaxed" id="deleteGuruConfirmText">Apakah Anda yakin?</p>
+          <input type="hidden" id="delGuruRowNum">
+          <div class="flex gap-2">
+            <button onclick="closeDeleteGuruModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition-all">BATAL</button>
+            <button onclick="executeDeleteGuru()" id="btnExecuteDeleteGuru" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md active:scale-95">YA, HAPUS</button>
+          </div>
+        </div>
+      </div>
+
       <div id="tabSiswa" class="hidden tab-pane fade-in space-y-4">
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           
@@ -949,7 +1025,7 @@
 
 <script>
   // MASUKKAN URL WEB APP DARI LANGKAH 1 DI SINI
-    const API_URL = "https://script.google.com/macros/s/AKfycbw53TjLGfYlKM926uS9UZhNULZJXjeopc0Rl7suYhUFR9sns_m7H_FihMejjeu9CsgM/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyeAjqU515hq8MAWYtHF5jjMm0pkoBtrybt-14J94otBSxu34yY9RsOz6omURdrAmjr/exec"; 
 
     // Fungsi canggih pengganti google.script.run
     async function panggilAPI(actionName, parameters) {
@@ -987,6 +1063,7 @@
     let currentKomplenStudents = []; // Penampung data komplain yang sedang tampil
     let recentlyEditedKomplen = []; 
     let sessionRevisedScores = [];
+    let cachedTeachersData = null; // <--- TAMBAHKAN BARIS INI
 
     document.addEventListener("DOMContentLoaded", function() {
       // 1. Fokuskan kursor langsung ke kolom username saat aplikasi dibuka
@@ -1120,6 +1197,7 @@
       
       // Tarik ulang pangkalan data baru dari Google Sheet
       loadInitialData(); 
+      cachedTeachersData = null;
     }
 
 async function processLogin() {
@@ -1190,9 +1268,13 @@ async function processLogin() {
             document.getElementById("navBtnInput").className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-sm border border-emerald-500";
             
             if (userRole === "ADMIN") {
-              document.getElementById("navBtnAdmin").className = baseClass; document.getElementById("navBtnSiswa").className = baseClass;
+              document.getElementById("navBtnAdminGuru").className = baseClass; 
+              document.getElementById("navBtnAdminTugas").className = baseClass; 
+              document.getElementById("navBtnSiswa").className = baseClass;
             } else {
-              document.getElementById("navBtnAdmin").className = "hidden"; document.getElementById("navBtnSiswa").className = "hidden";
+              document.getElementById("navBtnAdminGuru").className = "hidden"; 
+              document.getElementById("navBtnAdminTugas").className = "hidden"; 
+              document.getElementById("navBtnSiswa").className = "hidden";
             }
         } else {
             btn.disabled = false; btn.textContent = "MASUK KE DASHBOARD"; showToast(res.message, "error");
@@ -1486,8 +1568,7 @@ async function processLogin() {
       document.getElementById("jumpRuangSelect").value = "";
     }
 
-    // PERBAIKAN TOTAL: Fungsi Simpan Dilengkapi Proteksi Anti-Gagal Internet (Offline Protection)
-// PERBAIKAN TOTAL: Fungsi Simpan Pakai API (Luar Apps Script)
+    // PERBAIKAN TOTAL: Fungsi Simpan Pakai API (Terima Angka & Huruf Alpa)
     async function saveScore() {
       if (!selectedSubject) return;
 
@@ -1513,23 +1594,34 @@ async function processLogin() {
       const scoreValue = document.getElementById("finalScoreToSave").value.trim();
       if (scoreValue === "") return;
 
+      // --- VALIDASI PINTAR: Terima Angka ATAU Huruf A, I, S, ? ---
+      const upperScore = scoreValue.toUpperCase();
+      const validLetters = ["A", "I", "S", "?"];
+      const isLetter = validLetters.includes(upperScore);
       const numScore = parseFloat(scoreValue);
-      if (isNaN(numScore) || numScore < 0 || numScore > 100) {
-        showToast("⚠️ Nilai salah! Harus antara 0 - 100", "error");
-        if (inputMode === 'manual') { document.getElementById("scoreInputManual").focus(); document.getElementById("scoreInputManual").select(); } 
-        else { const firstInp = document.querySelector('.mistake-input'); if (firstInp) { firstInp.focus(); firstInp.select(); } }
-        return; 
+      
+      if (!isLetter) {
+        if (isNaN(numScore) || numScore < 0 || numScore > 100) {
+          showToast("⚠️ Nilai salah! Ketik angka (0-100) atau huruf A, I, S, ?", "error");
+          if (inputMode === 'manual') { document.getElementById("scoreInputManual").focus(); document.getElementById("scoreInputManual").select(); } 
+          else { const firstInp = document.querySelector('.mistake-input'); if (firstInp) { firstInp.focus(); firstInp.select(); } }
+          return; 
+        }
       }
+      
+      // Jika yang diinput adalah huruf (a, i, s), pastikan tersimpan sebagai Huruf Besar
+      const finalScoreToSave = isLetter ? upperScore : scoreValue;
+      // -----------------------------------------------------------
 
       // 2. SIMPAN KE MEMORI LOKAL & UPDATE UI 
-      studentsData[currentIndex].scores[selectedSubject] = scoreValue;
+      studentsData[currentIndex].scores[selectedSubject] = finalScoreToSave;
       const masterIdx = masterStudentsData.findIndex(m => m.rowNum === student.rowNum);
-      if (masterIdx !== -1) masterStudentsData[masterIdx].scores[selectedSubject] = scoreValue;
+      if (masterIdx !== -1) masterStudentsData[masterIdx].scores[selectedSubject] = finalScoreToSave;
 
       showToast("Tersimpan: " + student.nama.split(" ")[0], "success");
       updateProgressBar();
 
-      // 4. PINDAH SISWA SEGERA (Biar guru tidak nunggu loading server)
+      // 4. PINDAH SISWA SEGERA
       if (document.getElementById("autoAdvanceCheck").checked && currentIndex < studentsData.length - 1) {
         nextStudent();
       } else {
@@ -1541,12 +1633,11 @@ async function processLogin() {
         await panggilAPI("updateStudentScore", {
           studentIdPps: student.id_pps,
           subjectName: selectedSubject,
-          scoreValue: scoreValue,
+          scoreValue: finalScoreToSave,
           sheetName: activeTingkatan
         });
       } catch (err) {
         console.error("Gagal simpan : ", err);
-        // Mengembalikan inputan ke murid yang gagal
         showEmergencyError(student.nama);
       }
     }
@@ -1692,10 +1783,10 @@ async function loadInitialData() {
       }
     }
 
-    // TAMBAHAN: Fungsi Logout Kilat (Menghapus RAM browser & mengunci kembali aplikasi)
+    // TAMBAHAN: Fungsi Logout Kilat
     function logout() {
-      studentsData = []; subjectsList = []; currentIndex = 0; selectedSubject = "";
-      userRole = "GURU"; // Reset role
+      studentsData = []; cachedTeachersData = null; subjectsList = []; currentIndex = 0; selectedSubject = "";
+      userRole = "GURU"; 
       
       document.getElementById("subjectSelect").innerHTML = '<option value="" disabled selected>-- Pilih Fan --</option>';
       document.getElementById("entrySection").classList.add("hidden");
@@ -1704,92 +1795,99 @@ async function loadInitialData() {
       document.getElementById("topStats").classList.add("hidden");
       document.getElementById("topStats").classList.remove("flex");
       
-      // PERBAIKAN MUTLAK: Tutup wrapper dan kembalikan sidebar ke luar layar
       document.getElementById("dashboardWrapper").classList.add("hidden");
       document.getElementById("dashboardWrapper").classList.remove("flex");
       document.getElementById("sidebarPanel").classList.add("-translate-x-full");
       document.getElementById("sidebarBackdrop").classList.add("hidden");
       
-      // PERBAIKAN MUTLAK: Sembunyikan tombol burger dan menu Admin
       document.getElementById("hamburgerMenu").classList.add("hidden");
       document.getElementById("hamburgerMenu").classList.remove("block");
-      document.getElementById("navBtnAdmin").classList.add("hidden");
+      
+      // Sembunyikan semua tombol admin
+      document.getElementById("navBtnAdminGuru").classList.add("hidden");
+      document.getElementById("navBtnAdminTugas").classList.add("hidden");
+      document.getElementById("navBtnSiswa").classList.add("hidden");
       
       document.getElementById("loginUser").value = "";
       document.getElementById("loginPass").value = "";
       document.getElementById("loginOverlay").classList.remove("hidden");
       
       document.getElementById("subjectSelectAlpa").innerHTML = '<option value="" disabled selected>-- Pilih Fan --</option>';
+      
+      // Sembunyikan semua tab
       document.getElementById("tabAlpa").classList.add("hidden");
-      document.getElementById("navBtnAlpa").className = "hidden"; // Sembunyikan tombol menu alpa
-      document.getElementById("navBtnSiswa").classList.add("hidden");
       document.getElementById("tabSiswa").classList.add("hidden");
-      document.getElementById("navBtnKomplen").classList.add("hidden");
       document.getElementById("tabKomplen").classList.add("hidden");
-      document.getElementById("navBtnAnalisa").classList.add("hidden");
       document.getElementById("tabAnalisa").classList.add("hidden");
+      document.getElementById("tabAdminGuru").classList.add("hidden");
+      document.getElementById("tabAdminTugas").classList.add("hidden");
+      
+      const tabAnalisaSoalEl = document.getElementById("tabAnalisaSoal") || document.getElementById("tabAnalisasoal");
+      if (tabAnalisaSoalEl) tabAnalisaSoalEl.classList.add("hidden");
+      
+      document.getElementById("navBtnAlpa").className = "hidden"; 
+      document.getElementById("navBtnKomplen").classList.add("hidden");
+      document.getElementById("navBtnAnalisa").classList.add("hidden");
       document.getElementById("navBtnAnalisasoal").classList.add("hidden");
-      if (document.getElementById("tabAnalisaSoal")) document.getElementById("tabAnalisaSoal").classList.add("hidden");
-      if (document.getElementById("tabAnalisasoal")) document.getElementById("tabAnalisasoal").classList.add("hidden");
       
       const btn = document.getElementById("btnLogin");
       btn.disabled = false;
       btn.textContent = "MASUK KE DASHBOARD";
 
       showToast("Berhasil keluar. Data aman!", "success");
-      
       setTimeout(() => { const loginUserInput = document.getElementById("loginUser"); if(loginUserInput) loginUserInput.focus(); }, 200);
     }
 
     // TAMBAHAN: Fungsi Pengendali Mekanisme Pergantian Tab Dashboard
     function switchTab(target) {
-      // 1. TANGKAP SEMUA TOMBOL (Termasuk navBtnAnalisasoal)
       const btnInput = document.getElementById("navBtnInput");
-      const btnAdmin = document.getElementById("navBtnAdmin");
+      const btnAdminGuru = document.getElementById("navBtnAdminGuru");
+      const btnAdminTugas = document.getElementById("navBtnAdminTugas");
       const btnAlpa = document.getElementById("navBtnAlpa");
       const btnSiswa = document.getElementById("navBtnSiswa");
       const btnKomplen = document.getElementById("navBtnKomplen");
       const btnAnalisa = document.getElementById("navBtnAnalisa"); 
-      const btnAnalisasoal = document.getElementById("navBtnAnalisasoal"); // <-- PERBAIKAN 1: Ditambahkan
+      const btnAnalisasoal = document.getElementById("navBtnAnalisasoal"); 
       
       const tabInput = document.getElementById("tabInput");
-      const tabAdmin = document.getElementById("tabAdmin");
+      const tabAdminGuru = document.getElementById("tabAdminGuru");
+      const tabAdminTugas = document.getElementById("tabAdminTugas");
       const tabAlpa = document.getElementById("tabAlpa");
       
       if (!document.getElementById("sidebarPanel").classList.contains("-translate-x-full") && window.innerWidth < 768) {
-        toggleSidebar(); // Tutup otomatis di HP
+        toggleSidebar(); 
       }
       
-      // 2. RESET SEMUA WARNA TOMBOL KE ABU-ABU DASAR
       const baseClass = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-transparent";
       
       btnInput.className = baseClass; 
       btnAlpa.className = baseClass; 
       btnKomplen.className = baseClass; 
       btnAnalisa.className = baseClass;
-      btnAnalisasoal.className = baseClass; // <-- PERBAIKAN 2: Ditambahkan agar bisa reset
+      btnAnalisasoal.className = baseClass; 
       
       if (userRole === "ADMIN") { 
-        btnAdmin.className = baseClass; 
+        btnAdminGuru.className = baseClass; 
+        btnAdminTugas.className = baseClass; 
         btnSiswa.className = baseClass; 
       } else { 
-        btnAdmin.className = "hidden"; 
+        btnAdminGuru.className = "hidden"; 
+        btnAdminTugas.className = "hidden"; 
         btnSiswa.className = "hidden"; 
       }
 
-      // 3. SEMBUNYIKAN SEMUA TAB
       tabInput.classList.add("hidden"); 
-      tabAdmin.classList.add("hidden"); 
+      tabAdminGuru.classList.add("hidden"); 
+      tabAdminTugas.classList.add("hidden"); 
       tabAlpa.classList.add("hidden"); 
       document.getElementById("tabSiswa").classList.add("hidden");
       document.getElementById("tabKomplen").classList.add("hidden");
       document.getElementById("tabAnalisa").classList.add("hidden");
       
-      // CATATAN: Pastikan ID di HTML tab Anda adalah id="tabAnalisaSoal" (pakai S besar)
       const tabAnalisaSoalEl = document.getElementById("tabAnalisaSoal") || document.getElementById("tabAnalisasoal");
       if (tabAnalisaSoalEl) tabAnalisaSoalEl.classList.add("hidden");
       
-      // 4. TAMPILKAN TAB YANG DIPILIH & BERI WARNA TOMBOL
+      // RUTE TAMPILAN
       if (target === 'input') {
         tabInput.classList.remove("hidden");
         btnInput.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-sm border border-emerald-500";
@@ -1803,9 +1901,7 @@ async function loadInitialData() {
         btnKomplen.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-orange-500 text-white shadow-sm border border-orange-500";
         filterKomplenTable();
       } else if (target === 'analisasoal') { 
-        // <-- PERBAIKAN 3: Tombol btnAnalisasoal yang diwarnai, bukan btnAnalisa
         if (tabAnalisaSoalEl) tabAnalisaSoalEl.classList.remove("hidden");
-        // Saya beri warna Rose/Merah Muda agar beda dengan Analisa Nilai
         btnAnalisasoal.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-rose-600 text-white shadow-sm border border-rose-500"; 
         initDataAnalisaOtomatis();
       } else if (target === 'analisa') { 
@@ -1819,167 +1915,304 @@ async function loadInitialData() {
         document.getElementById("tabSiswa").classList.remove("hidden");
         btnSiswa.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm border border-blue-500";
         initSiswaFilters(); 
-      } else {
+      } else if (target === 'admin_guru') {
         if (userRole !== "ADMIN") return;
-        tabAdmin.classList.remove("hidden");
-        btnAdmin.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-sm border border-indigo-500";
+        tabAdminGuru.classList.remove("hidden");
+        btnAdminGuru.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-sm border border-indigo-500";
+        loadTeachersManagementData(); 
+      } else if (target === 'admin_tugas') {
+        if (userRole !== "ADMIN") return;
+        tabAdminTugas.classList.remove("hidden");
+        btnAdminTugas.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-sky-600 text-white shadow-sm border border-sky-500";
         loadTeachersManagementData(); 
       }
     }
 
-    // TAMBAHAN: Mengambil rekap monitoring dari spreadsheet
-async function loadTeachersManagementData() {
-      const tbody = document.getElementById("teacherTableBody");
-      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 font-medium animate-pulse">Menghitung progres kerja guru...</td></tr>';
-      document.querySelector("#tabAdmin h2").innerHTML = `Manajemen Guru <span class="text-blue-600">- ${activeTingkatan.replace("Data_", "").toUpperCase()}</span>`;
-      try {
-        const teachers = await panggilAPI("getTeachersManagementData", { sheetName: activeTingkatan });
-        tbody.innerHTML = "";
-        if (!teachers || teachers.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Belum ada data guru.</td></tr>'; return; }
+    // ====================================================================
+    // JURUS ANTI-LEMOT 1: RENDER TABEL TERPISAH (Biar bisa pakai Cache)
+    // ====================================================================
+    function renderTeacherTables(teachers) {
+      const tbodyGuru = document.getElementById("guruTableBody");
+      const tbodyTugas = document.getElementById("tugasTableBody");
+      
+      if(tbodyGuru) tbodyGuru.innerHTML = "";
+      if(tbodyTugas) tbodyTugas.innerHTML = "";
+
+      if (!teachers || teachers.length === 0) { 
+        if(tbodyGuru) tbodyGuru.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400 italic">Belum ada data guru.</td></tr>'; 
+        if(tbodyTugas) tbodyTugas.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Belum ada daftar tugas.</td></tr>'; 
+        return; 
+      }
+      
+      let adaTugas = false;
+
+      teachers.forEach(t => {
+        const dataJson = JSON.stringify({ rowNum: t.rowNum, nama: t.nama, username: t.username, password: t.password, role: t.role }).replace(/'/g, "&#39;");
+
+        // 1. RENDER GURU
+        let scheduleDisplay = `<span class="text-rose-500 font-bold">Belum Diatur</span>`;
+        if (t.tglMulai && t.tglSelesai) scheduleDisplay = `<span class="text-emerald-600">${t.tglMulai}</span> <span class="text-slate-400 text-[9px] mx-1">s/d</span> <span class="text-emerald-600">${t.tglSelesai}</span>`;
         
-        teachers.forEach(t => {
-          let tasksHTML = "";
-          t.duties.forEach((duty) => {
-            tasksHTML += `
-              <div class="inline-flex flex-col bg-slate-100 text-slate-700 font-semibold px-2 py-1.5 rounded text-[10px] mr-1.5 mb-1.5 border border-slate-200/60 hover:bg-slate-200 shadow-sm">
-                <div class="flex justify-between items-center gap-2 mb-1">
-                  <span>${duty.subject} (Kls ${duty.className})</span>
-                  <span class="px-1 rounded-sm font-black ${duty.progress === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-700'}">${duty.progress}%</span>
-                  <button onclick="removeDuty(${t.rowNum}, ${duty.originalIndex}, '${t.nama}', '${duty.subject}', '${duty.className}')" class="text-rose-500 hover:text-rose-700 font-bold px-0.5 rounded text-xs">&times;</button>
-                </div>
-                <span class="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none">${duty.tingkatan}</span>
-              </div>`;
-          });
-          if(!tasksHTML) tasksHTML = '<span class="text-slate-400 italic text-[10px]">Belum memiliki tugas</span>';
-          
-          let scheduleDisplay = `<span class="text-rose-500 font-bold">Belum Diatur</span>`;
-          if (t.tglMulai && t.tglSelesai) scheduleDisplay = `<span class="text-emerald-600">${t.tglMulai}</span> s/d <span class="text-emerald-600">${t.tglSelesai}</span>`;
-          
-          const tr = document.createElement("tr"); tr.className = "hover:bg-slate-50/80 transition-colors";
-          tr.innerHTML = `
-            <td class="p-3"><div class="font-bold text-slate-800">${t.nama}</div><div class="text-[10px] text-slate-400">User: ${t.username} | Role: ${t.role}</div><div class="text-[9px] text-slate-500 mt-1">Jadwal: ${scheduleDisplay}</div></td>
-            <td class="p-3 max-w-xs md:max-w-md break-words">${tasksHTML}</td>
-            <td class="p-3 text-center align-middle"><div class="text-[11px] font-black">${t.progress}%</div><div class="text-[9px] text-slate-400 font-bold">${t.detailProgress}</div></td>
-            <td class="p-3 text-right align-middle">
-              <button onclick="openDutyModal(${t.rowNum}, '${t.nama}')" class="bg-blue-50 text-blue-600 font-bold px-2 py-1 rounded text-[10px] w-full">+ Tugas</button>
-              <button onclick="openScheduleModal(${t.rowNum}, '${t.nama}', '${t.tglMulai}', '${t.tglSelesai}')" class="bg-emerald-50 text-emerald-600 font-bold px-2 py-1.5 mt-1.5 rounded text-[10px] w-full">📅 Jadwal</button>
-            </td>`;
-          tbody.appendChild(tr);
+        const trGuru = document.createElement("tr"); 
+        trGuru.className = "hover:bg-slate-50/80 transition-colors border-b border-slate-100";
+        trGuru.innerHTML = `
+          <td class="p-3 align-middle">
+            <div class="font-bold text-slate-800 text-[11px]">${t.nama}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">User: <span class="text-slate-600 font-semibold">${t.username}</span> | Role: <span class="font-bold ${t.role==='ADMIN'?'text-blue-600':'text-slate-500'}">${t.role}</span></div>
+          </td>
+          <td class="p-3 text-center align-middle"><div class="text-[10px] bg-white border border-slate-100 p-1.5 rounded-lg inline-block shadow-sm">${scheduleDisplay}</div></td>
+          <td class="p-3 text-right align-middle">
+            <div class="flex items-center justify-end gap-1.5 flex-wrap">
+              <button onclick="openScheduleModal(${t.rowNum}, '${t.nama}', '${t.tglMulai}', '${t.tglSelesai}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded text-[10px] transition-all active:scale-95 border border-emerald-200">📅 Atur Jadwal</button>
+              <button onclick='openFormGuruModal("edit", ${dataJson})' class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold px-3 py-1.5 rounded text-[10px] transition-all active:scale-95">EDIT</button>
+              <button onclick="confirmDeleteGuru(${t.rowNum}, '${t.nama}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-1.5 rounded text-[10px] transition-all active:scale-95">HAPUS</button>
+            </div>
+          </td>`;
+        if(tbodyGuru) tbodyGuru.appendChild(trGuru);
+
+        // 2. RENDER TUGAS
+        let tasksHTML = "";
+        t.duties.forEach((duty) => {
+          adaTugas = true;
+          tasksHTML += `
+            <div class="inline-flex flex-col bg-slate-100 text-slate-700 font-semibold px-2 py-1.5 rounded text-[10px] mr-1.5 mb-1.5 border border-slate-200/60 hover:bg-slate-200 shadow-sm transition-colors">
+              <div class="flex justify-between items-center gap-2 mb-1">
+                <span>${duty.subject} (Kls ${duty.className})</span>
+                <span class="px-1 rounded-sm font-black ${duty.progress === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-700'}">${duty.progress}%</span>
+                <button onclick="removeDuty(${t.rowNum}, ${duty.originalIndex}, '${t.nama}', '${duty.subject}', '${duty.className}')" class="text-rose-500 hover:text-rose-700 font-bold px-0.5 rounded text-xs leading-none" title="Hapus Tugas">&times;</button>
+              </div>
+              <span class="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none">${duty.tingkatan}</span>
+            </div>`;
         });
-      } catch (e) { showToast("Gagal memuat manajemen guru: " + e.message, "error"); }
+        
+        if(tasksHTML || t.role !== "ADMIN") { 
+          const trTugas = document.createElement("tr");
+          trTugas.className = "hover:bg-slate-50/80 transition-colors border-b border-slate-100";
+          trTugas.innerHTML = `
+            <td class="p-3 align-middle whitespace-nowrap"><div class="font-bold text-slate-800 text-[11px]">${t.nama}</div><div class="text-[9px] text-slate-400 font-medium mt-0.5">${t.role}</div></td>
+            <td class="p-3 align-middle max-w-sm break-words">${tasksHTML || '<span class="text-slate-400 italic text-[10px]">Belum memiliki tugas di tingkatan ini.</span>'}</td>
+            <td class="p-3 text-center align-middle"><div class="text-[11px] font-black ${t.progress === 100 ? 'text-emerald-600' : 'text-slate-700'}">${t.progress}%</div><div class="text-[9px] text-slate-400 font-bold">${t.detailProgress}</div></td>
+            <td class="p-3 text-right align-middle">
+              <button onclick="openDutyModal(${t.rowNum}, '${t.nama}')" class="bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold px-3 py-1.5 rounded-lg text-[10px] transition-all active:scale-95 shadow-sm whitespace-nowrap border border-sky-200">+ Tambah Tugas</button>
+            </td>
+          `;
+          if(tbodyTugas) tbodyTugas.appendChild(trTugas);
+        }
+      });
+
+      if (!adaTugas && tbodyTugas) { tbodyTugas.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Belum ada tugas yang diberikan.</td></tr>'; }
     }
 
-    // ================= FUNGSI ATUR JADWAL GURU =================
+    // ====================================================================
+    // JURUS ANTI-LEMOT 2: LOAD DATA DARI RAM (CACHE) DALAM 0 MILIDETIK
+    // ====================================================================
+    function loadTeachersManagementData(silent = false) {
+      const tingkatanJudul = activeTingkatan.replace("Data_", "").toUpperCase();
+      const h2Guru = document.querySelector("#tabAdminGuru h2");
+      const h2Tugas = document.querySelector("#tabAdminTugas h2");
+      if(h2Guru) h2Guru.innerHTML = `Guru & Korektor <span class="text-indigo-600">- ${tingkatanJudul}</span>`;
+      if(h2Tugas) h2Tugas.innerHTML = `Manajemen Tugas <span class="text-sky-600">- ${tingkatanJudul}</span>`;
+
+      // Jika data sudah pernah dimuat, langsung tampilkan dari RAM tanpa loading
+      if (cachedTeachersData && !silent) {
+        renderTeacherTables(cachedTeachersData);
+      } else if (!silent) {
+        const tbodyGuru = document.getElementById("guruTableBody");
+        const tbodyTugas = document.getElementById("tugasTableBody");
+        if(tbodyGuru) tbodyGuru.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400 font-medium animate-pulse">Memuat data guru...</td></tr>';
+        if(tbodyTugas) tbodyTugas.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 font-medium animate-pulse">Memuat daftar tugas...</td></tr>';
+      }
+
+      // TETAP Tarik data fresh dari Google Sheet di latar belakang secara diam-diam
+      panggilAPI("getTeachersManagementData", { sheetName: activeTingkatan }).then(teachers => {
+        cachedTeachersData = teachers;
+        renderTeacherTables(teachers); // Layar tiba-tiba terupdate tanpa loading berkedip
+      }).catch(e => {
+        showToast("Gagal memuat data: " + e.message, "error");
+      });
+    }
+
+    // ====================================================================
+    // JURUS ANTI-LEMOT 3: SIMPAN DI LATAR BELAKANG (0 DETIK UI BLOCKING)
+    // ====================================================================
     function openScheduleModal(rowNum, name, tglMulai, tglSelesai) {
       document.getElementById("modalScheduleRowNum").value = rowNum;
       document.getElementById("modalScheduleName").value = name;
-      
-      // Jika "undefined" atau kosong, biarkan kotak input kalender kosong
       document.getElementById("modalTglMulai").value = (tglMulai !== 'undefined' && tglMulai) ? tglMulai : "";
       document.getElementById("modalTglSelesai").value = (tglSelesai !== 'undefined' && tglSelesai) ? tglSelesai : "";
-      
       document.getElementById("scheduleModal").classList.remove("hidden");
     }
+    function closeScheduleModal() { document.getElementById("scheduleModal").classList.add("hidden"); }
 
-    function closeScheduleModal() {
-      document.getElementById("scheduleModal").classList.add("hidden");
-    }
-
-    // ================= EKSEKUSI SIMPAN JADWAL GURU =================
-async function submitSchedule() {
+    function submitSchedule() {
       const rowNum = parseInt(document.getElementById("modalScheduleRowNum").value, 10); 
       const tMulai = document.getElementById("modalTglMulai").value;
       const tSelesai = document.getElementById("modalTglSelesai").value;
-      const btn = document.getElementById("btnSubmitSchedule");
       if (!rowNum || isNaN(rowNum)) return;
-      btn.disabled = true; btn.textContent = "MENYIMPAN...";
-      try {
-        await panggilAPI("updateTeacherSchedule", { rowNum: rowNum, tglMulai: tMulai, tglSelesai: tSelesai });
-        showToast("Jadwal Akses Berhasil Diperbarui!", "success"); closeScheduleModal();
-        btn.disabled = false; btn.textContent = "SIMPAN JADWAL"; loadTeachersManagementData(); 
-      } catch (e) { btn.disabled = false; btn.textContent = "SIMPAN JADWAL"; showToast("Gagal: " + e.message, "error"); }
+      
+      // 1. Eksekusi API Latar Belakang (Tanpa Await)
+      panggilAPI("updateTeacherSchedule", { rowNum: rowNum, tglMulai: tMulai, tglSelesai: tSelesai })
+        .then(() => {
+          showToast("Jadwal Akses Berhasil Diperbarui!", "success");
+          loadTeachersManagementData(true); // Silent refresh tabel
+        }).catch(e => showToast("Gagal: " + e.message, "error"));
+
+      // 2. Langsung tutup modal di detik ke-0 (User merasa super cepat)
+      closeScheduleModal();
+      showToast("Memproses data di latar belakang...", "success");
     }
 
-    // Membuka modal dan otomatis menyuntikkan Tingkatan yang sedang aktif
     function openDutyModal(rowNum, name) {
       document.getElementById("modalTeacherRowNum").value = rowNum;
       document.getElementById("modalTeacherName").value = name;
       document.getElementById("modalClassInput").value = "";
-      
-      // Ambil nama tingkatan dari pangkalan data yang sedang terbuka di layar
       const currentTingkatanStr = activeTingkatan.replace("Data_", "");
       document.getElementById("modalTingkatanView").value = currentTingkatanStr;
       document.getElementById("modalTingkatanValue").value = currentTingkatanStr;
-      
       document.getElementById("dutyModal").classList.remove("hidden");
     }
+    function closeDutyModal() { document.getElementById("dutyModal").classList.add("hidden"); }
 
-    function closeDutyModal() {
-      document.getElementById("dutyModal").classList.add("hidden");
-    }
-
-    // Mengirim perintah simpan tugas dilengkapi dengan variabel Tingkatan
-async function submitNewDuty() {
+    function submitNewDuty() {
       const rowNum = document.getElementById("modalTeacherRowNum").value;
       const sub = document.getElementById("modalSubjectSelect").value;
       const cls = document.getElementById("modalClassInput").value.trim();
       const tkt = document.getElementById("modalTingkatanValue").value; 
-      const btn = document.getElementById("btnSubmitDuty");
       if(!cls) { showToast("Kelas tugas wajib diisi!", "error"); return; }
-      btn.disabled = true; btn.textContent = "MENYIMPAN...";
-      try {
-        await panggilAPI("addTeacherDuty", { rowNum: rowNum, newSubject: sub, newClass: cls, newTingkatan: tkt });
-        showToast("Tugas Baru Berhasil Ditambahkan!", "success"); closeDutyModal();
-        btn.disabled = false; btn.textContent = "SIMPAN PERUBAHAN TUGAS"; loadTeachersManagementData(); 
-      } catch (e) { btn.disabled = false; btn.textContent = "SIMPAN PERUBAHAN TUGAS"; showToast("Gagal: " + e.message, "error"); }
-    }
-
-    // SESUAIKAN FUNGSI LOGOUT LAMA: Tambahkan pembersihan variabel baru & tutup wrapper dashboard
-    // Cari fungsi logout() lama Anda, tambahkan baris reset ini di dalam fungsinya:
-    // userRole = "GURU";
-    // document.getElementById("dashboardWrapper").classList.add("hidden");
-    // document.getElementById("dashboardWrapper").classList.remove("flex");
-    // document.getElementById("navBtnAdmin").classList.add("hidden");
-
-    // PERUBAHAN 4: Fungsi Toggle Slide Sidebar Buka/Tutup di Layar HP
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebarPanel");
-      const backdrop = document.getElementById("sidebarBackdrop");
       
-      if (sidebar.classList.contains("-translate-x-full")) {
-        // Buka Sidebar
-        sidebar.classList.remove("-translate-x-full");
-        backdrop.classList.remove("hidden");
-      } else {
-        // Tutup Sidebar
-        sidebar.classList.add("-translate-x-full");
-        backdrop.classList.add("hidden");
-      }
+      panggilAPI("addTeacherDuty", { rowNum: rowNum, newSubject: sub, newClass: cls, newTingkatan: tkt })
+        .then(() => {
+          showToast("Tugas Baru Berhasil Ditambahkan!", "success");
+          loadTeachersManagementData(true);
+        }).catch(e => showToast("Gagal tambah tugas: " + e.message, "error"));
+
+      closeDutyModal();
+      showToast("Memproses di latar belakang...", "success");
     }
 
-    // PERBAIKAN: Fungsi hapus kustom memanggil Modal Konfirmasi yang cantik
     function removeDuty(rowNum, index, teacherName, subject, className) {
       document.getElementById("delRowNum").value = rowNum;
       document.getElementById("delDutyIndex").value = index;
-      document.getElementById("deleteConfirmText").innerHTML = `Menghapus Fan <b>${subject} (Kelas ${className})</b> dari daftar tugas Ust/Ustdz <b>${teacherName}</b>. Aksi ini tidak dapat dibatalkan.`;
-      
+      document.getElementById("deleteConfirmText").innerHTML = `Menghapus Fan <b>${subject} (Kelas ${className})</b> dari daftar tugas Ust/Ustdz <b>${teacherName}</b>.`;
       document.getElementById("deleteConfirmModal").classList.remove("hidden");
     }
+    function closeDeleteModal() { document.getElementById("deleteConfirmModal").classList.add("hidden"); }
 
-    function closeDeleteModal() {
-      document.getElementById("deleteConfirmModal").classList.add("hidden");
-    }
-
-async function executeDeleteDuty() {
+    function executeDeleteDuty() {
       const rowNum = document.getElementById("delRowNum").value;
       const index = document.getElementById("delDutyIndex").value;
-      const btn = document.getElementById("btnExecuteDelete");
-      btn.disabled = true; btn.textContent = "MENGHAPUS...";
-      try {
-        await panggilAPI("deleteTeacherDuty", { rowNum: rowNum, indexToDelete: index });
-        showToast("Tugas berhasil dihapus!", "success"); closeDeleteModal();
-        btn.disabled = false; btn.textContent = "YA, HAPUS"; loadTeachersManagementData(); 
-      } catch (e) { btn.disabled = false; btn.textContent = "YA, HAPUS"; showToast("Gagal: " + e.message, "error"); }
+      
+      panggilAPI("deleteTeacherDuty", { rowNum: rowNum, indexToDelete: index })
+        .then(() => {
+          showToast("Tugas berhasil dihapus!", "success");
+          loadTeachersManagementData(true);
+        }).catch(e => showToast("Gagal: " + e.message, "error"));
+
+      closeDeleteModal();
+      showToast("Mengahapus di latar belakang...", "success");
+    }
+
+    function openFormGuruModal(mode, data = null) {
+      document.getElementById("guruFormMode").value = mode;
+      document.getElementById("formGuruTitle").textContent = mode === 'tambah' ? 'Tambah Guru Baru' : 'Edit Data Guru';
+      if (mode === 'edit' && data) {
+        document.getElementById("guruFormRowNum").value = data.rowNum;
+        document.getElementById("fgNama").value = data.nama;
+        document.getElementById("fgUser").value = data.username;
+        document.getElementById("fgPass").value = data.password; 
+        document.getElementById("fgRole").value = data.role;
+      } else {
+        document.getElementById("guruFormRowNum").value = ""; document.getElementById("fgNama").value = "";
+        document.getElementById("fgUser").value = ""; document.getElementById("fgPass").value = "";
+        document.getElementById("fgRole").value = "GURU";
+      }
+      document.getElementById("formGuruModal").classList.remove("hidden");
+    }
+    function closeFormGuruModal() { document.getElementById("formGuruModal").classList.add("hidden"); }
+
+    function submitGuruForm() {
+      const mode = document.getElementById("guruFormMode").value;
+      
+      // PERBAIKAN: Tambahkan pengiriman 'tingkatan' ke payload
+      const payload = {
+        nama: document.getElementById("fgNama").value.trim(), 
+        username: document.getElementById("fgUser").value.trim(),
+        password: document.getElementById("fgPass").value.trim(), 
+        role: document.getElementById("fgRole").value,
+        tingkatan: activeTingkatan.replace("Data_", "") // <-- Ambil otomatis dari tab yang sedang aktif
+      };
+      
+      if (!payload.nama || !payload.username || !payload.password) { showToast("Semua kolom wajib diisi!", "error"); return; }
+      
+      if (mode === 'tambah') { 
+        panggilAPI("addTeacherData", { data: payload }).then(() => { showToast("Data Guru disimpan!", "success"); loadTeachersManagementData(true); }).catch(e => showToast("Gagal: " + e.message, "error"));
+      } else { 
+        const rowNum = document.getElementById("guruFormRowNum").value; 
+        panggilAPI("updateTeacherData", { rowNum: rowNum, data: payload }).then(() => { showToast("Data Guru diperbarui!", "success"); loadTeachersManagementData(true); }).catch(e => showToast("Gagal: " + e.message, "error"));
+      }
+      
+      closeFormGuruModal();
+      showToast("Menyimpan data di latar belakang...", "success");
+    }
+
+    function confirmDeleteGuru(rowNum, nama) {
+      document.getElementById("delGuruRowNum").value = rowNum;
+      document.getElementById("deleteGuruConfirmText").innerHTML = `Menghapus akun guru <b>${nama}</b> beserta histori tugasnya secara permanen.`;
+      document.getElementById("deleteGuruConfirmModal").classList.remove("hidden");
+    }
+    function closeDeleteGuruModal() { document.getElementById("deleteGuruConfirmModal").classList.add("hidden"); }
+
+    function executeDeleteGuru() {
+      const rowNum = document.getElementById("delGuruRowNum").value;
+      panggilAPI("deleteTeacherData", { rowNum: rowNum }).then(() => { showToast("Guru dihapus!", "success"); loadTeachersManagementData(true); }).catch(e => showToast("Gagal: " + e.message, "error"));
+      closeDeleteGuruModal();
+      showToast("Menghapus di latar belakang...", "success");
+    }
+
+    // ====================================================================
+    // JURUS ANTI-LEMOT 4: CRUD SISWA JUGA DIBIKIN LATAR BELAKANG
+    // ====================================================================
+    function submitSiswaForm() {
+      const mode = document.getElementById("siswaFormMode").value; 
+      const payload = {
+        no: document.getElementById("fsNo").value, abs: document.getElementById("fsAbs").value,
+        nama: document.getElementById("fsNama").value, id_pps: document.getElementById("fsIdPps").value,
+        kelas: document.getElementById("fsKelas").value, no_imda: document.getElementById("fsNoImda").value,
+        ruang_imda: document.getElementById("fsRuang").value, domisili: document.getElementById("fsDomisili").value
+      };
+      
+      if(!payload.no || !payload.nama || !payload.kelas) { showToast("No, Nama, dan Kelas wajib diisi!", "error"); return; }
+      
+      if (mode === 'tambah') {
+        panggilAPI("addStudentData", { data: payload, sheetName: activeTingkatan }).then(() => silentRefreshMasterData());
+      } else {
+        const rowNum = document.getElementById("siswaFormRowNum").value;
+        panggilAPI("updateStudentData", { rowNum: rowNum, data: payload, sheetName: activeTingkatan }).then(() => silentRefreshMasterData());
+      }
+      
+      closeFormSiswaModal(); 
+      showToast("Diproses di latar belakang...", "success");
+    }
+
+    function executeDeleteSiswa() {
+      const rowNum = document.getElementById("delSiswaRowNum").value;
+      panggilAPI("deleteStudentData", { rowNum: rowNum, sheetName: activeTingkatan }).then(() => silentRefreshMasterData());
+      closeDeleteSiswaModal(); 
+      showToast("Dihapus di latar belakang...", "success"); 
+    }
+
+    function silentRefreshMasterData() {
+      panggilAPI("getSheetData", { sheetName: activeTingkatan }).then(rawData => {
+        masterStudentsData = [];
+        const headers = rawData[0]; const subjectStartIdx = 8;
+        for (let i = 1; i < rawData.length; i++) {
+          const row = rawData[i]; if (!row[0]) continue;
+          const student = { rowNum: i + 1, no: row[0], abs: row[1], id_pps: row[2], nama: row[3], domisili: row[4], kelas: row[5] ? String(row[5]).trim() : "", no_imda: row[6], ruang_imda: row[7], scores: {} };
+          for (let j = subjectStartIdx; j < headers.length; j++) { student.scores[headers[j]] = row[j]; }
+          masterStudentsData.push(student);
+        }
+        initSiswaFilters(); showToast("Sinkronisasi Selesai!", "success");
+      });
     }
 
     // ================= LOGIKA TAB CEK ALPA (UPDATED: FAN+KELAS) =================
@@ -2120,7 +2353,7 @@ async function executeDeleteDuty() {
           </td>
           <td class="p-3 text-center align-middle">
             <select onchange="saveKeteranganAlpa(${masterIdx}, '${subj}', this)" onclick="event.stopPropagation()" class="w-full bg-white border border-slate-300 text-slate-600 text-[11px] font-bold rounded p-1.5 outline-none focus:border-indigo-500 cursor-pointer shadow-sm">
-               <option value="" disabled ${(!valStr || valStr === "0") ? 'selected' : ''}>Pilih...</option>
+               
                <option value="A" ${valStr === "A" ? 'selected' : ''}>A alpa</option>
                <option value="I" ${valStr === "I" ? 'selected' : ''}>I izin</option>
                <option value="S" ${valStr === "S" ? 'selected' : ''}>S sakit</option>
@@ -2516,76 +2749,6 @@ async function saveInlineAlpaScore(rowNum, masterIdx, subjectName) {
 
     function closeFormSiswaModal() { document.getElementById("formSiswaModal").classList.add("hidden"); }
 
-    // 5. Eksekusi Simpan dengan Silent Master Data Refresh (PERBAIKAN TYPO ID)
-async function submitSiswaForm() {
-      const mode = document.getElementById("siswaFormMode").value; 
-      const btn = document.getElementById("btnSubmitSiswa");
-      const payload = {
-        no: document.getElementById("fsNo").value, abs: document.getElementById("fsAbs").value,
-        nama: document.getElementById("fsNama").value, id_pps: document.getElementById("fsIdPps").value,
-        kelas: document.getElementById("fsKelas").value, no_imda: document.getElementById("fsNoImda").value,
-        ruang_imda: document.getElementById("fsRuang").value, domisili: document.getElementById("fsDomisili").value
-      };
-      
-      if(!payload.no || !payload.nama || !payload.kelas) { showToast("No, Nama, dan Kelas wajib diisi!", "error"); return; }
-      btn.disabled = true; btn.textContent = "Menyimpan...";
-      
-      try {
-        if (mode === 'tambah') {
-          await panggilAPI("addStudentData", { data: payload, sheetName: activeTingkatan });
-        } else {
-          const rowNum = document.getElementById("siswaFormRowNum").value;
-          await panggilAPI("updateStudentData", { rowNum: rowNum, data: payload, sheetName: activeTingkatan });
-        }
-        closeFormSiswaModal(); showToast("Data berhasil disimpan!", "success"); silentRefreshMasterData(); 
-      } catch (e) {
-        btn.disabled = false; btn.textContent = "SIMPAN DATA"; showToast("Gagal: " + e.message, "error");
-      }
-    }
-
-    // 6. FUNGSI HAPUS SISWA BARU: Menggunakan Modal UI Kustom
-    function confirmDeleteSiswa(rowNum, nama) {
-      document.getElementById("delSiswaRowNum").value = rowNum;
-      document.getElementById("deleteSiswaConfirmText").innerHTML = `Menghapus permanen data dan seluruh nilai Murid bernama <b>${nama}</b>. Aksi ini tidak dapat dibatalkan.`;
-      
-      document.getElementById("deleteSiswaConfirmModal").classList.remove("hidden");
-    }
-
-    function closeDeleteSiswaModal() {
-      document.getElementById("deleteSiswaConfirmModal").classList.add("hidden");
-    }
-
-async function executeDeleteSiswa() {
-      const rowNum = document.getElementById("delSiswaRowNum").value;
-      const btn = document.getElementById("btnExecuteDeleteSiswa");
-      btn.disabled = true; btn.textContent = "MENGHAPUS...";
-      try {
-        await panggilAPI("deleteStudentData", { rowNum: rowNum, sheetName: activeTingkatan });
-        showToast("Siswa dihapus. Memperbarui database...", "success"); 
-        closeDeleteSiswaModal(); btn.disabled = false; btn.textContent = "YA, HAPUS"; silentRefreshMasterData(); 
-      } catch(e) {
-        btn.disabled = false; btn.textContent = "YA, HAPUS"; showToast("Gagal Hapus: " + e.message, "error");
-      }
-    }
-
-    // FUNGSI KRUSIAL: Memperbarui data RAM lokal setelah baris Spreadsheet berubah (Tanpa Loading Screen Berisik)
-async function silentRefreshMasterData() {
-      try {
-        const rawData = await panggilAPI("getSheetData", { sheetName: activeTingkatan });
-        masterStudentsData = [];
-        const headers = rawData[0]; const subjectStartIdx = 8;
-        for (let i = 1; i < rawData.length; i++) {
-          const row = rawData[i]; if (!row[0]) continue;
-          const student = { rowNum: i + 1, no: row[0], abs: row[1], id_pps: row[2], nama: row[3], domisili: row[4], kelas: row[5] ? String(row[5]).trim() : "", no_imda: row[6], ruang_imda: row[7], scores: {} };
-          for (let j = subjectStartIdx; j < headers.length; j++) { student.scores[headers[j]] = row[j]; }
-          masterStudentsData.push(student);
-        }
-        const btn = document.getElementById("btnSubmitSiswa");
-        if(btn) { btn.disabled = false; btn.textContent = "SIMPAN DATA"; }
-        initSiswaFilters(); showToast("Sinkronisasi Selesai!", "success");
-      } catch (err) {}
-    }
-
 
     // ================= LOGIKA TAB KOMPLAIN (ANTI-CRASH & AMAN TANDA PETIK) =================
     function onSubjKomplenChange() {
@@ -2730,29 +2893,55 @@ async function silentRefreshMasterData() {
       });
     }
 
-    // PERBAIKAN 3: Fungsi Simpan Adaptif Layar PC & HP
-async function saveKomplenScore(masterIdx, subjectName) {
+    // PERBAIKAN FINAL: Fungsi Simpan Komplain Adaptif (Bisa Angka & Huruf A, I, S, ?)
+    async function saveKomplenScore(masterIdx, subjectName) {
       if (!navigator.onLine) { showToast("❌ KONEKSI PUTUS!", "error"); return; }
       const targetStudent = masterStudentsData[masterIdx];
       const inputEl = document.getElementById(`komplenScore_${targetStudent.rowNum}`);
       const inputElMob = document.getElementById(`komplenScoreMob_${targetStudent.rowNum}`);
       let scoreValue = ""; let activeInput = null;
-      if (window.innerWidth < 768) { if (inputElMob) { scoreValue = inputElMob.value.trim(); activeInput = inputElMob; } } 
-      else { if (inputEl) { scoreValue = inputEl.value.trim(); activeInput = inputEl; } }
+      
+      if (window.innerWidth < 768) { 
+        if (inputElMob) { scoreValue = inputElMob.value.trim(); activeInput = inputElMob; } 
+      } else { 
+        if (inputEl) { scoreValue = inputEl.value.trim(); activeInput = inputEl; } 
+      }
       
       if (scoreValue === "") { showToast("Ketik nilai revisi terlebih dahulu!", "error"); return; }
-      const numScore = parseFloat(scoreValue);
-      if (isNaN(numScore) || numScore < 0 || numScore > 100) { showToast("⚠️ Nilai salah!", "error"); if (activeInput) { activeInput.focus(); activeInput.select(); } return; }
       
-      targetStudent.scores[subjectName] = scoreValue;
+      // --- LOGIKA PINTAR: Terima Angka 0-100 ATAU Huruf A, I, S, ? ---
+      const upperScore = scoreValue.toUpperCase();
+      const validLetters = ["A", "I", "S", "?"];
+      const isLetter = validLetters.includes(upperScore);
+      const numScore = parseFloat(scoreValue);
+      
+      if (!isLetter) {
+        if (isNaN(numScore) || numScore < 0 || numScore > 100) { 
+          showToast("⚠️ Nilai salah! Ketik angka 0-100 atau A, I, S, ?", "error"); 
+          if (activeInput) { activeInput.focus(); activeInput.select(); } 
+          return; 
+        }
+      }
+      
+      // Pastikan yang disimpan ke server adalah huruf besar
+      const finalScoreToSave = isLetter ? upperScore : scoreValue;
+      // --------------------------------------------------------------
+
+      targetStudent.scores[subjectName] = finalScoreToSave;
       if (!recentlyEditedKomplen.includes(targetStudent.id_pps)) recentlyEditedKomplen.unshift(targetStudent.id_pps);
       const trackerKey = targetStudent.id_pps + "|" + subjectName;
       if (!sessionRevisedScores.includes(trackerKey)) sessionRevisedScores.push(trackerKey);
       showToast(`Nilai direvisi!`, "success");
       
       try {
-        await panggilAPI("updateStudentScore", { studentIdPps: targetStudent.id_pps, subjectName: subjectName, scoreValue: scoreValue, sheetName: activeTingkatan });
+        await panggilAPI("updateStudentScore", { 
+          studentIdPps: targetStudent.id_pps, 
+          subjectName: subjectName, 
+          scoreValue: finalScoreToSave, 
+          sheetName: activeTingkatan 
+        });
       } catch (err) { showEmergencyError(targetStudent.nama); }
+      
       filterKomplenTable();
     }
 
