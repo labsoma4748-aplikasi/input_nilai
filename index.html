@@ -47,7 +47,7 @@
   </div>
 
   <!-- TOP NAVBAR -->
-  <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
+  <header class="bg-white border-b border-slate-200 shadow-sm z-40 flex-none">
     <div class="w-full px-4 py-2 flex flex-row justify-between items-center gap-3">
       <div class="flex items-center gap-2">
         <button id="hamburgerMenu" onclick="toggleSidebar()" class="hidden md:hidden text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg border border-slate-200 active:scale-95 transition-all">
@@ -99,11 +99,11 @@
     <p class="text-xs font-bold text-slate-600 animate-pulse font-jakarta">Menyinkronkan Database...</p>
   </div>
 
-<div id="dashboardWrapper" class="hidden flex-1 flex flex-col md:flex-row w-full relative overflow-hidden">
+<div id="dashboardWrapper" class="hidden flex-1 flex flex-col md:flex-row w-full min-h-0 overflow-hidden">
     
-    <div id="sidebarBackdrop" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/40 z-40 transition-opacity duration-300 md:hidden"></div>
+    <div id="sidebarBackdrop" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/40 z-[55] transition-opacity duration-300 md:hidden"></div>
 
-    <aside id="sidebarPanel" class="fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 p-4 flex flex-col justify-between z-50 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-xl md:shadow-none overflow-y-auto custom-scrollbar">
+    <aside id="sidebarPanel" class="fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 p-4 flex flex-col justify-between z-[60] transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-xl md:shadow-none overflow-y-auto custom-scrollbar">
       <div class="space-y-4">
         <div class="flex justify-between items-center md:hidden border-b border-slate-100 pb-2">
           <span class="text-[10px] font-bold uppercase text-slate-400">Navigasi</span>
@@ -1925,6 +1925,24 @@ async function loadInitialData() {
         tabAdminTugas.classList.remove("hidden");
         btnAdminTugas.className = "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold bg-sky-600 text-white shadow-sm border border-sky-500";
         loadTeachersManagementData(); 
+      }
+    }
+
+    // PERBAIKAN: Fungsi Toggle Slide Sidebar Buka/Tutup di Layar HP
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebarPanel");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      
+      if (sidebar.classList.contains("-translate-x-full")) {
+        // Buka Sidebar
+        sidebar.classList.remove("-translate-x-full");
+        sidebar.classList.add("translate-x-0"); // <--- Tambahan Wajib
+        backdrop.classList.remove("hidden");
+      } else {
+        // Tutup Sidebar
+        sidebar.classList.add("-translate-x-full");
+        sidebar.classList.remove("translate-x-0"); // <--- Tambahan Wajib
+        backdrop.classList.add("hidden");
       }
     }
 
