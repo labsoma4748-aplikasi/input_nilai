@@ -2120,7 +2120,7 @@ async function executeDeleteDuty() {
           </td>
           <td class="p-3 text-center align-middle">
             <select onchange="saveKeteranganAlpa(${masterIdx}, '${subj}', this)" onclick="event.stopPropagation()" class="w-full bg-white border border-slate-300 text-slate-600 text-[11px] font-bold rounded p-1.5 outline-none focus:border-indigo-500 cursor-pointer shadow-sm">
-               // <option value="" disabled ${(!valStr || valStr === "0") ? 'selected' : ''}>Pilih...</option>
+               <option value="" disabled ${(!valStr || valStr === "0") ? 'selected' : ''}>Pilih...</option>
                <option value="A" ${valStr === "A" ? 'selected' : ''}>A alpa</option>
                <option value="I" ${valStr === "I" ? 'selected' : ''}>I izin</option>
                <option value="S" ${valStr === "S" ? 'selected' : ''}>S sakit</option>
