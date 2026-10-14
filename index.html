@@ -1523,7 +1523,10 @@ async function processLogin() {
     function updateProgressBar() {
       let filled = 0;
       studentsData.forEach(s => { const v = s.scores[selectedSubject]; if(v !== undefined && v !== null && v !== "") filled++; });
-      const pct = Math.round((filled / studentsData.length) * 100);
+      
+      // PERBAIKAN: Ganti Math.round menjadi Math.floor agar tidak prematur 100%
+      const pct = Math.floor((filled / studentsData.length) * 100);
+      
       document.getElementById('progressBar').style.width = pct + "%";
       document.getElementById('progressText').textContent = pct + "% (" + filled + "/" + studentsData.length + ")";
     }
@@ -1946,9 +1949,6 @@ async function loadInitialData() {
       }
     }
 
-    // ====================================================================
-    // JURUS ANTI-LEMOT 1: RENDER TABEL TERPISAH (Biar bisa pakai Cache)
-    // ====================================================================
     function renderTeacherTables(teachers) {
       const tbodyGuru = document.getElementById("guruTableBody");
       const tbodyTugas = document.getElementById("tugasTableBody");
@@ -1966,6 +1966,9 @@ async function loadInitialData() {
 
       teachers.forEach(t => {
         const dataJson = JSON.stringify({ rowNum: t.rowNum, nama: t.nama, username: t.username, password: t.password, role: t.role }).replace(/'/g, "&#39;");
+
+        // PERBAIKAN 1: Paksa pembulatan ke bawah untuk progress keseluruhan Guru
+        let tProgress = Math.floor(t.progress || 0);
 
         // 1. RENDER GURU
         let scheduleDisplay = `<span class="text-rose-500 font-bold">Belum Diatur</span>`;
@@ -1992,11 +1995,15 @@ async function loadInitialData() {
         let tasksHTML = "";
         t.duties.forEach((duty) => {
           adaTugas = true;
+          
+          // PERBAIKAN 2: Paksa pembulatan ke bawah untuk per-tugas Guru
+          let dProgress = Math.floor(duty.progress || 0);
+          
           tasksHTML += `
             <div class="inline-flex flex-col bg-slate-100 text-slate-700 font-semibold px-2 py-1.5 rounded text-[10px] mr-1.5 mb-1.5 border border-slate-200/60 hover:bg-slate-200 shadow-sm transition-colors">
               <div class="flex justify-between items-center gap-2 mb-1">
                 <span>${duty.subject} (Kls ${duty.className})</span>
-                <span class="px-1 rounded-sm font-black ${duty.progress === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-700'}">${duty.progress}%</span>
+                <span class="px-1 rounded-sm font-black ${dProgress === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-700'}">${dProgress}%</span>
                 <button onclick="removeDuty(${t.rowNum}, ${duty.originalIndex}, '${t.nama}', '${duty.subject}', '${duty.className}')" class="text-rose-500 hover:text-rose-700 font-bold px-0.5 rounded text-xs leading-none" title="Hapus Tugas">&times;</button>
               </div>
               <span class="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none">${duty.tingkatan}</span>
@@ -2009,7 +2016,7 @@ async function loadInitialData() {
           trTugas.innerHTML = `
             <td class="p-3 align-middle whitespace-nowrap"><div class="font-bold text-slate-800 text-[11px]">${t.nama}</div><div class="text-[9px] text-slate-400 font-medium mt-0.5">${t.role}</div></td>
             <td class="p-3 align-middle max-w-sm break-words">${tasksHTML || '<span class="text-slate-400 italic text-[10px]">Belum memiliki tugas di tingkatan ini.</span>'}</td>
-            <td class="p-3 text-center align-middle"><div class="text-[11px] font-black ${t.progress === 100 ? 'text-emerald-600' : 'text-slate-700'}">${t.progress}%</div><div class="text-[9px] text-slate-400 font-bold">${t.detailProgress}</div></td>
+            <td class="p-3 text-center align-middle"><div class="text-[11px] font-black ${tProgress === 100 ? 'text-emerald-600' : 'text-slate-700'}">${tProgress}%</div><div class="text-[9px] text-slate-400 font-bold">${t.detailProgress}</div></td>
             <td class="p-3 text-right align-middle">
               <button onclick="openDutyModal(${t.rowNum}, '${t.nama}')" class="bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold px-3 py-1.5 rounded-lg text-[10px] transition-all active:scale-95 shadow-sm whitespace-nowrap border border-sky-200">+ Tambah Tugas</button>
             </td>
